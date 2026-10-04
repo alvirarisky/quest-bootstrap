@@ -1,3 +1,4 @@
+import { howTo } from "./interaction.js";
 import { bootsy, creature } from "./characters.js";
 import { esc, challenge } from "./challenges.js";
 import { missions, incidentFlavor } from "../gameData.js";
@@ -12,7 +13,7 @@ function identity(s, feedback) {
   return `<section class="identity-screen"><div class="identity-character"><span class="issue-sticker">SEBELUM NGUTAK-NGATIK DIV…</span><h1>SIAPA<br>KAMU, BRAY?</h1>${bootsy("thinking")}<div class="clipboard-note">Identitas asli.<br>Situasi nggak pasti.</div></div><form id="identity-form" class="identity-form"><div class="paper-clip"></div><span class="form-kicker">DAFTAR PASUKAN BERESIN WEB</span>${[
     ["fullName", "Nama Lengkap", "Nama sesuai presensi"],
     ["nim", "NIM", "Nomor induk mahasiswa"],
-    ["className", "Kelas", "Contoh: TI-2A"],
+    ["className", "Kelas", "Contoh: TI-24-XX"],
   ]
     .map(
       ([k, label, placeholder]) =>
@@ -36,7 +37,7 @@ function incident(s, feedback) {
         : m.id === 8
           ? "shocked"
           : "idle";
-  return `<section class="episode episode-${m.id} ${done ? "episode-repaired" : ""}"><div class="episode-heading"><div><span class="episode-index">INSIDEN ${String(m.id).padStart(2, "0")} / 08 <i>${f.tag}</i></span><h1>${m.label}</h1></div><div class="episode-mascot">${bootsy(mood)}<span>${done ? f.win : f.line}</span></div></div><p class="question">${m.prompt}</p>${challenge(m, s.drafts[m.id] || [], done)}<div class="episode-bottom"><div class="feedback-area" role="status">${done ? `<strong class="success">${f.win}</strong><p>${m.explanation}</p>` : feedback?.message ? `<strong>${feedback.incomplete ? "BENTAR, BRAY." : "WEB-NYA MASIH AMBYAR."}</strong><p>${esc(feedback.message)}</p>` : "<strong>GILIRAN KAMU, BRAY.</strong><p>Pasang pilihanmu, lalu kirim. Petunjuk tidak mengurangi nilai.</p>"}${s.hints[m.id] ? `<p class="hint"><b>KATA BOOTSY:</b> ${m.hint}</p>` : ""}${failed ? "<small>Jawaban pertama terkunci. Perbaikan berikutnya tidak mengubah nilai.</small>" : ""}</div><div class="episode-actions">${done ? action(m.id === 8 ? "LIHAT HASILKU →" : "INSIDEN BERIKUTNYA →", m.id === 8 ? "result" : "next") : action("KIRIM JAWABAN →", "submit")}${!done ? action("BANTUIN, BOOTSY", "hint", true) : ""}${failed ? action("LIHAT PERBAIKAN", "repair", true) : ""}</div></div></section>`;
+  return `<section class="episode episode-${m.id} ${done ? "episode-repaired" : ""}"><div class="episode-heading"><div><span class="episode-index">INSIDEN ${String(m.id).padStart(2, "0")} / 08 <i>${f.tag}</i></span><h1>${m.label}</h1></div><div class="episode-mascot">${bootsy(mood)}<span>${done ? f.win : f.line}</span></div></div><p class="question">${m.prompt}</p>${howTo(m, s.drafts[m.id] || [], done)}${challenge(m, s.drafts[m.id] || [], done)}<div class="episode-bottom"><div class="feedback-area" role="status">${done ? `<strong class="success">${f.win}</strong><p>${m.explanation}</p>` : feedback?.message ? `<strong>${feedback.incomplete ? "BENTAR, BRAY." : "WEB-NYA MASIH AMBYAR."}</strong><p>${esc(feedback.message)}</p>` : "<strong>GILIRAN KAMU, BRAY.</strong><p>Pasang pilihanmu, lalu kirim. Petunjuk tidak mengurangi nilai.</p>"}${s.hints[m.id] ? `<p class="hint"><b>KATA BOOTSY:</b> ${m.hint}</p>` : ""}${failed ? "<small>Jawaban pertama terkunci. Perbaikan berikutnya tidak mengubah nilai.</small>" : ""}</div><div class="episode-actions">${done ? action(m.id === 8 ? "LIHAT HASILKU →" : "INSIDEN BERIKUTNYA →", m.id === 8 ? "result" : "next") : action("KIRIM JAWABAN →", "submit")}${!done ? action("BANTUIN, BOOTSY", "hint", true) : ""}${failed ? action("LIHAT PERBAIKAN", "repair", true) : ""}</div></div></section>`;
 }
 function result(s) {
   const score = scoreGame(s.results);

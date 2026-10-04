@@ -4,6 +4,9 @@
 // Uses an installed Google Chrome; no production dependency is required.
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
+const screenshotDir = process.env.SCREENSHOT_DIR;
+if (screenshotDir) await mkdir(screenshotDir, { recursive: true });
 import { missions } from "../src/gameData.js";
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 try {
@@ -17,7 +20,8 @@ try {
     page.on("pageerror", (error) => errors.push(error.message));
     const click = (action) => page.locator(`[data-action="${action}"]`).click();
     await page.goto(process.env.BASE_URL || "http://127.0.0.1:5173");
-    if (await page.locator(".bootsy-intro").count()) await page.locator("[data-intro-close]").first().click();
+    if (await page.locator(".bootsy-intro").count())
+      await page.locator("[data-intro-close]").first().click();
     await click("start");
     await page.locator("button[type=submit]").click();
     assert.equal(await page.locator("#identity-form").count(), 1);
@@ -40,6 +44,13 @@ try {
         true,
         `Incident ${m.id} overflow at ${width}`,
       );
+      assert.equal(await page.locator(".how-to").count(), 1);
+      assert.match(await page.locator(".how-to").innerText(), /CARA MAIN/);
+      if (screenshotDir)
+        await page.screenshot({
+          path: `${screenshotDir}/${width}-incident-${m.id}.png`,
+          fullPage: true,
+        });
       if (m.id === 1) {
         await page.locator('[data-value="0"]').click();
         await click("submit");
@@ -49,6 +60,21 @@ try {
         await click("repair");
       } else {
         if (m.blocks) {
+          await page.locator(".assembly-list").scrollIntoViewIfNeeded();
+          await page.locator(".show-click-demo").waitFor();
+          if (screenshotDir)
+            await page.screenshot({
+              path: `${screenshotDir}/${width}-grid-demo.png`,
+              fullPage: true,
+            });
+          await page.locator("[data-action=add]").first().click();
+          assert.equal(await page.locator(".filled-slot").count(), 1);
+          await page.locator("[data-action=remove]").click();
+          assert.equal(await page.locator(".filled-slot").count(), 0);
+          assert.equal(await page.locator(".next-slot").count(), 1);
+          assert.equal(await page.locator(".show-click-demo").count(), 0);
+          await page.reload();
+          assert.equal(await page.locator(".show-click-demo").count(), 0);
           for (const value of m.answers)
             await page
               .locator("[data-action=add]:not(:disabled)")
@@ -74,6 +100,10 @@ try {
             m.answers[0],
           );
         }
+        assert.match(
+          await page.locator(".how-to").innerText(),
+          new RegExp(`${m.answers.length}/${m.answers.length} bagian terisi`),
+        );
         await click("submit");
       }
       assert.equal(await page.locator("fieldset:disabled").count(), 1);

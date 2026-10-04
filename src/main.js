@@ -6,6 +6,7 @@ import { validIdentity, readIdentity } from "./identity.js";
 import { elapsed, formatTime } from "./timer.js";
 import { screen, hud } from "./ui/screens.js";
 import { shouldIntroduce, showBootsyIntro } from "./ui/intro.js";
+import { demonstrateAssembly } from "./ui/interaction.js";
 const app = document.querySelector("#app");
 let storage;
 try {
@@ -30,6 +31,7 @@ function render() {
   if (state.page === "mission" && !available(state, state.current))
     state.current = Math.min(8, state.results.length + 1);
   app.innerHTML = `<div class="game-shell page-${state.page}">${hud(state)}<main>${screen(state, feedback)}</main>${notice ? `<p role="alert" class="storage-warning">${notice}</p>` : ""}<footer><span>BELAJAR BOOTSTRAP, SATU MISI SEKALIGUS.</span><span>MISI BERESIN WEB / BARENG BOOTSY</span></footer></div>`;
+  demonstrateAssembly(app);
   app.querySelector("#identity-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const identity = readIdentity(e.target);
