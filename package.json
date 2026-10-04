@@ -1,0 +1,19 @@
+{
+  "name": "bootstrap-seru",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check src/main.js && node --check src/gameData.js && node --check src/state.js && node --check src/ui/challenges.js && node --check src/ui/screens.js && node --check src/ui/characters.js && node --check src/ui/intro.js"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
